@@ -21,3 +21,6 @@
 
 ## ملاحظة Gemini
 الحزمة تضبط القالب المستقبلي على `FEATURE_GEMINI=true`. على Railway الحالي يمكن إبقاء المتغير كما هو لأن ترقية V8.1 تفعّل Feature Flag الخاص بـ Gemini، لكن يجب أن يكون `GEMINI_API_KEY` صالحاً.
+
+## تحديث V8.1.1 Performance Rocket
+هذه الحزمة تتضمن تحسينات سرعة جراحية للقوائم وFeature Flags واتصالات PostgreSQL دون حذف ميزات. راجع PERFORMANCE_V8_1_1_AR.md.
