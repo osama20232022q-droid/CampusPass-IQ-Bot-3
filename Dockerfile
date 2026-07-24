@@ -69,7 +69,8 @@ RUN python scripts/verify_runtime_files.py \
       tests/test_v6_9_phase5_operations_reliability.py \
       tests/test_v7_0_phase6_pilot_quality.py \
       tests/test_v8_0a_enterprise_core.py \
-      tests/test_v8_0b_enterprise_scale.py
+      tests/test_v8_0b_enterprise_scale.py \
+      tests/test_v8_1_ux_wallet_settlement.py
 
 FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
