@@ -1,32 +1,14 @@
-# رفع CampusPass IQ V8.0-B إلى GitHub وRailway
+# CampusPass IQ — نسخة الفحص الإنتاجي
 
+هذه الحزمة تحتوي على **8 ملفات فقط** للرفع إلى جذر مستودع GitHub.
+
+## طريقة الرفع
 1. فك ضغط الحزمة الخارجية فقط.
-2. ارفع الملفات الثمانية إلى جذر مستودع GitHub.
-3. لا تفك `source_bundle.zip`.
-4. حافظ على `DATABASE_URL` و`ENCRYPTION_KEY` و`BOT_TOKEN` السابقة.
-5. خذ Backup قبل النشر.
-6. اترك `PILOT_STRICT_STARTUP=false` في أول نشر، ثم فعّله بعد نجاح الفحص.
+2. ارفع الملفات الثمانية إلى جذر المستودع واستبدل الملفات القديمة بنفس الأسماء.
+3. لا تفك `source_bundle.zip` الداخلي؛ Dockerfile يتحقق من بصمته ويفكه أثناء بناء Railway.
+4. تأكد أن Railway يستخدم Dockerfile وأن Health Check هو `/health/ready`.
 
-## متغيرات التوسع الجديدة الاختيارية
-
-```env
-ENTERPRISE_JOB_LEASE_SECONDS=180
-ENTERPRISE_JOB_BASE_BACKOFF_SECONDS=15
-ENTERPRISE_JOB_MAX_BACKOFF_SECONDS=3600
-ENTERPRISE_WORKER_STALE_SECONDS=120
-ENTERPRISE_WEBHOOK_TIMEOUT_SECONDS=10
-ENTERPRISE_WEBHOOK_MAX_ATTEMPTS=8
-ENTERPRISE_WEBHOOK_BASE_BACKOFF_SECONDS=30
-ENTERPRISE_WEBHOOK_MAX_BACKOFF_SECONDS=21600
-ENTERPRISE_GRACE_DAYS=7
-```
-
-Docker يتحقق من SHA-256 للحزمة الداخلية قبل فكها، ثم يثبت المتطلبات ويشغّل فحوص المشروع قبل إنشاء صورة التشغيل.
-
-## تحديث توافق متغيرات Railway
-تم تحسين قارئ الإعدادات ليتعامل بأمان مع صيغ القوائم الشائعة في Railway، ومنها:
-- 7,3,1
-- 7;3;1
-- [7,3,1]
-- ["paid","success"]
-وذلك بدون تعطيل أي ميزة أو حذف أي متغير.
+## ما تم الحفاظ عليه
+- جميع ملفات المشروع والميزات موجودة داخل `source_bundle.zip`.
+- لم تُحذف handlers أو services أو migrations.
+- تم الحفاظ على اختبارات البناء والتحقق المرحلي.
