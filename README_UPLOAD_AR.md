@@ -1,20 +1,20 @@
-# CampusPass IQ V9 LTS — Stability Freeze
+# CampusPass IQ V9.0.1 LTS — Build Lock Fix
 
-هذه حزمة GitHub المدمجة. ارفع الملفات الموجودة هنا إلى **جذر المستودع** واستبدل الملفات القديمة.
+هذه الحزمة صممت لمنع Railway من بناء source_bundle قديم بالخطأ.
 
-- لا تفك `source_bundle.zip` داخل GitHub.
-- Dockerfile يتحقق من SHA-256 ثم يفك المصدر أثناء Build.
-- عدد ملفات الرفع الخارجي أقل من 100.
+## ارفع هذه الملفات السبعة إلى جذر GitHub
+- Dockerfile
+- railway.json
+- requirements.txt
+- VERSION.txt
+- source_bundle_v9_0_1.zip
+- source_bundle_v9_0_1.zip.sha256
+- README_UPLOAD_AR.md
 
-## متغيرات موصى بها للأداء
+لا تفك `source_bundle_v9_0_1.zip`.
 
-```env
-PROCESSING_INDICATOR_DELAY_MS=450
-REPORT_SNAPSHOT_RETENTION_DAYS=30
-```
+بعد النشر ابحث في Build Logs عن:
 
-لأفضل استمرارية للـFSM والـrate limiting يمكن إضافة `REDIS_URL` لاحقاً، لكن النسخة تعمل بدونه على instance واحدة.
+`BUILD_SOURCE_LOCK_OK version=9.0.1-lts-build-lock`
 
-## سياسة التقارير
-
-بعد 30 يوماً يتم تفريغ **snapshot الثقيل** للتقرير وإلغاء رابط الوصول القديم، لكن لا تُحذف الطلبات أو المبيعات أو الحركات المالية أو بيانات المصدر. لذلك يمكن توليد تقرير شهري أو سنوي جديد من البيانات الأصلية في أي وقت.
+إذا لم يظهر هذا السطر، فـ Railway لم يبنِ هذا الإصدار.

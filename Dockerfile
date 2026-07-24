@@ -3,24 +3,27 @@ FROM python:3.12-slim AS builder
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    CAMPUSPASS_EXPECTED_VERSION=9.0.1-lts-build-lock
 
 WORKDIR /app
-COPY source_bundle.zip source_bundle.zip.sha256 /tmp/
+COPY source_bundle_v9_0_1.zip source_bundle_v9_0_1.zip.sha256 /tmp/
 
 RUN python - <<'PYEXTRACT'
 from __future__ import annotations
 
 import hashlib
+import os
 import stat
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 
-archive = Path('/tmp/source_bundle.zip')
-expected = Path('/tmp/source_bundle.zip.sha256').read_text(encoding='utf-8').split()[0].lower()
-actual = hashlib.sha256(archive.read_bytes()).hexdigest()
-if actual != expected:
-    raise SystemExit(f'checksum mismatch: expected {expected}, got {actual}')
+archive = Path('/tmp/source_bundle_v9_0_1.zip')
+checksum_file = Path('/tmp/source_bundle_v9_0_1.zip.sha256')
+expected_sha = checksum_file.read_text(encoding='utf-8').split()[0].lower()
+actual_sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+if actual_sha != expected_sha:
+    raise SystemExit(f'checksum mismatch: expected {expected_sha}, got {actual_sha}')
 
 destination = Path('/app').resolve()
 with ZipFile(archive) as bundle:
@@ -38,6 +41,18 @@ with ZipFile(archive) as bundle:
         if target != destination and destination not in target.parents:
             raise SystemExit(f'archive path escapes destination: {member.filename}')
     bundle.extractall(destination)
+
+expected_version = os.environ['CAMPUSPASS_EXPECTED_VERSION']
+actual_version = (destination / 'VERSION.txt').read_text(encoding='utf-8').strip()
+app_init = (destination / 'app' / '__init__.py').read_text(encoding='utf-8')
+finance = (destination / 'app' / 'bot' / 'handlers' / 'admin' / 'finance.py').read_text(encoding='utf-8')
+if actual_version != expected_version:
+    raise SystemExit(f'wrong source bundle version: expected {expected_version}, got {actual_version}')
+if expected_version not in app_init:
+    raise SystemExit('app.__version__ does not match the locked V9.0.1 release')
+if 'صافي إيراد الإدارة' not in finance:
+    raise SystemExit('required finance regression label is missing from source bundle')
+print(f'BUILD_SOURCE_LOCK_OK version={actual_version} sha256={actual_sha[:12]}')
 PYEXTRACT
 
 RUN python -m venv /opt/venv
